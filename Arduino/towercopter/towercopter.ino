@@ -101,8 +101,8 @@ void loop() {
   input = map(distance, 2, 50, 0, 100);
 
   pid();
-  mv = map(out, 0, 100, 1650, 1755);
-  esc.writeMicroseconds(mv);
+  mv = map(out, 0, 100, 0, 180);
+  esc.write(mv);
   delay(10);
 
   setpoint = 50;
