@@ -75,11 +75,7 @@ void loop() {
 
   buttonState = digitalRead(buttonPin);
 
-  if (buttonState == HIGH) {
-    Serial.println("Auto mode");
-  } else {
-    Serial.println("Manual mode");
-  }
+  
 
 
   // Reads the echoPin, returns the sound wave travel time in microseconds.
@@ -101,11 +97,32 @@ void loop() {
   input = map(distance, 2, 50, 0, 100);
 
   pid();
-  mv = map(out, 0, 100, 1650, 1755);
-  esc.writeMicroseconds(mv);
+  mv = map(out, 0, 100, 0, 180);
+  esc.write(mv);
   delay(10);
 
   setpoint = 50;
+
+  
+  // Printing on different button modes.
+  if (buttonState == HIGH) {
+    Serial.println("Auto mode");
+    //esc.writeMicroseconds(50);
+  } else {
+    Serial.println();
+    Serial.print("---");
+    Serial.print("Button state: " + String(buttonState) + (" (Manual mode)"));
+    Serial.print("---");
+    Serial.print("Distance: " + String(distance));
+    Serial.print("---");
+    Serial.print("Input: " + String(input));
+    Serial.print("---");
+    Serial.print("Out: " + String(out));
+    Serial.print("---");
+    Serial.print("Mv: " + String(mv));
+    Serial.print("---");
+    //esc.writeMicroseconds(0);
+  }
 
 }
 
