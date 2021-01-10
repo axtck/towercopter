@@ -1,6 +1,3 @@
-// Main program file for towercopter.
-
-// Includes.
 #include <Servo.h>
 
 // Pins.
@@ -13,8 +10,8 @@
 Servo esc;
 
 // Ultrasonic sensor variables.
-long duration; // Duration of sound wave travel.
-int distance; // Distance measurement.
+long duration = 0; // Duration of sound wave travel.
+int distance = 0; // Distance measurement.
 
 const int min_distance = 2; // Min and max measurable distance limit.
 const int max_distance = 100;
@@ -23,46 +20,45 @@ const int max_distance = 100;
 int switchState = 0;
 
 // Pot variables.
-int potValue = 0; // Potentiometer values ()
-int potEscValue = 0;
-
-// Motor constants.
-const int MIN = 1000;
-const int MAX = 2500;
+int pot_val = 0; // Potentiometer values (0-1023).
 
 // PID variables.
-double proc_time = 0.6;
-double error = 0;
+const double proc_time = 0.6; // Constant process time.
+
+double error = 0; // Errors.
 double prev_error = 0;
 
-double p = 0;
+double p = 0; // PID values.
 double i = 0;
 double d = 0;
 
-float kp = 0.4;
-float ki = 0.005;
-float kd = 0.03;
+double kp = 0.4; // PID factors values.
+double ki = 0.005;
+double kd = 0.03;
 
-double integral = 0;
+double integral = 0; // Temporary values for calculation.
 double derivative = 0;
 
-int mv = 0;
-double out_val;
+double total_val = 0; // Total PID value.
 
-const int setpoint = 20;
+const int setpoint = 20; // Constant setpoint.
+
+// Writing variables.
+int write_val = 0; // Remapped value for writing to esc (manual / auto).
 
 void setup() {
   // Start serial communication.
   Serial.begin(9600);
 
-  // Define as in or output.
+  // Define in and outputs.
   pinMode(echoPin, INPUT);
   pinMode(trigPin, OUTPUT);
   pinMode(switchPin, INPUT);
 
-  // Attach.
-  esc.attach(escSignalPin, MIN, MAX);
-  esc.write(0);
+  // ESC startup.
+  esc.attach(escSignalPin); // Attach.
+  esc.writeMicroseconds(1500); // Send stop signal to ESC.
+  delay(7000); // Allow ESC to recognize stop signal.
 }
 
 void loop() {
@@ -94,42 +90,43 @@ void pidControl() {
   } else if (distance < min_distance) {
     distance = min_distance;
   }
+  // -- End ultrasonic sensor code. --
 
-  // -- End ultrasonic sensor code --
-
-  //in_val = map(distance, min_distance, max_distance, 0, 100);
+  // -- PID code. --
+  // Calculate error.
   error = setpoint - distance;
 
-  // Proportional.
+  // Proportional action.
   p = kp * error;
 
-  // Integral.
+  // Integral action (anti-windup).
   if (!(i < -20) || (i > 20)) {
     integral = error * proc_time;
     i += ki * integral;
   }
 
-  // differential.
+  // Derivative action.
   derivative = (error - prev_error) / proc_time;
   d = kd * derivative;
 
   // Total.
-  out_val = p + i + d;
+  total_val = p + i + d;
 
-  if (out_val > 100) {
-    out_val = 100;
+  // Limit total value.
+  if (total_val > 100) {
+    total_val = 100;
   }
-  if (out_val < 0) {
-    out_val = 0;
+  if (total_val < 0) {
+    total_val = 0;
   }
 
-  prev_error = error;
+  prev_error = error; // Set previous error to current error.
 
-  mv = map(out_val, 0, 100, 0, 180);
-  esc.write(mv);
+  write_val = map(total_val, 0, 100, 1100, 1900); // Map 0-100 to 1100-1900 (servo us).
+  esc.writeMicroseconds(write_val); // Write value to esc.
   delay(10);
 
-
+  // Print values.
   Serial.println();
   Serial.print("Switch state: " + String(switchState) + (" (auto mode)"));
   Serial.print("---");
@@ -145,23 +142,24 @@ void pidControl() {
   Serial.print("---");
   Serial.print("D: " + String(d));
   Serial.print("---");
-  Serial.print("Out: " + String(out_val));
+  Serial.print("Total value (0-100): " + String(total_val));
   Serial.print("---");
-  Serial.print("Mv: " + String(mv));
+  Serial.print("Total => write value (1100-1900): " + String(write_val));
   Serial.print("---");
 }
 
 void potControl() {
-  potValue = analogRead(A0);
-  potEscValue = map(potValue, 0, 1023, 0, 180); // Map from 0-1023 (pot) to 0-180 (servo).
-  esc.write(potEscValue);
+  pot_val = analogRead(A0); // Read pot value.
+  write_val = map(pot_val, 0, 1023, 1100, 1900); // Map from 0-1023 (pot) to 1100-1900 (servo us).
+  esc.writeMicroseconds(write_val); // Write value to esc.
 
+  // Print values.
   Serial.println();
   Serial.print("---");
   Serial.print("Switch state: " + String(switchState) + (" (manual mode)"));
   Serial.print("---");
-  Serial.print("Pot value (0-1023): " + String(potValue));
+  Serial.print("Pot value (0-1023): " + String(pot_val));
   Serial.print("---");
-  Serial.print("Pot => ESC value (0-180): " + String(potEscValue));
+  Serial.print("Pot => write value (1100-1900): " + String(write_val));
   Serial.print("---");
 }

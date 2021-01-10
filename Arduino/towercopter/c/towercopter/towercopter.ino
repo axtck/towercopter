@@ -67,7 +67,7 @@ void setup() {
 
   // Attach.
   esc.attach(escSignalPin, MIN, MAX);
-  esc.writeMicroseconds(0);
+  esc.write(0); // Send stop signal.
 }
 
 void loop() {
