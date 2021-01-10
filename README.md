@@ -33,18 +33,18 @@ The goal is to have a balancing platform, based on PID control.
 #### Hardware
 * [X] do research
 * [X] order components
-* [ ] wait for components
+* [X] wait for components
 * [X] build frame
 * [X] design platform that fits in frame (CAD)
 * [X] print design
 * [X] setup controllers (fresh Arduino & RPi)
-* [ ] build complete setup
+* [X] build complete setup
 
 
 #### Software
-* [ ] research Arduino libraries
-* [ ] write control for Arduino
-* [ ] write complete Arduino code
+* [X] research Arduino libraries
+* [X] write control for Arduino
+* [X] write complete Arduino code
 * [ ] research python libraries
 * [ ] write HC-SR04 code for RPi
 * [ ] write control for RPi (python)
