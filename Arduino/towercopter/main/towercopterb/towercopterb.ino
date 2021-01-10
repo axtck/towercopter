@@ -122,8 +122,8 @@ void pidControl() {
 
   prev_error = error; // Set previous error to current error.
 
-  write_val = map(total_val, 0, 100, 1100, 1900); // Map 0-100 to 1100-1900 (servo us).
-  esc.writeMicroseconds(write_val); // Write value to esc.
+  write_val = map(total_val, 0, 100, 0, 180); // Map 0-100 to 1100-1900 (servo us).
+  esc.write(write_val); // Write value to esc.
   delay(10);
 
   // Print values.
@@ -144,14 +144,14 @@ void pidControl() {
   Serial.print("---");
   Serial.print("Total value (0-100): " + String(total_val));
   Serial.print("---");
-  Serial.print("Total => write value (1100-1900): " + String(write_val));
+  Serial.print("Total => write value (0-180): " + String(write_val));
   Serial.print("---");
 }
 
 void potControl() {
   pot_val = analogRead(A0); // Read pot value.
-  write_val = map(pot_val, 0, 1023, 1100, 1900); // Map from 0-1023 (pot) to 1100-1900 (servo us).
-  esc.writeMicroseconds(write_val); // Write value to esc.
+  write_val = map(pot_val, 0, 1023, 0, 180); // Map from 0-1023 (pot) to 0-180 (servo us).
+  esc.write(write_val); // Write value to esc.
 
   // Print values.
   Serial.println();
@@ -160,6 +160,6 @@ void potControl() {
   Serial.print("---");
   Serial.print("Pot value (0-1023): " + String(pot_val));
   Serial.print("---");
-  Serial.print("Pot => write value (1100-1900): " + String(write_val));
+  Serial.print("Pot => write value (0-180): " + String(write_val));
   Serial.print("---");
 }
