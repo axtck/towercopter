@@ -32,9 +32,9 @@ double p = 0; // PID values.
 double i = 0;
 double d = 0;
 
-double kp = 0.4; // PID factors values.
-double ki = 0.005;
-double kd = 0.03;
+double kp = 0.9; // PID factors values.
+double ki = 0.03;
+double kd = 0.4;
 
 double integral = 0; // Temporary values for calculation.
 double derivative = 0;
@@ -57,7 +57,7 @@ void setup() {
 
   // ESC startup.
   esc.attach(escSignalPin); // Attach.
-  esc.writeMicroseconds(1500); // Send stop signal to ESC.
+  esc.write(0); // Send stop signal to ESC.
   delay(7000); // Allow ESC to recognize stop signal.
 }
 
@@ -100,14 +100,14 @@ void pidControl() {
   p = kp * error;
 
   // Integral action (anti-windup).
-  if(i < -20){
-    i = -20;
+  if (i < -5) {
+    i = -5;
   }
-  if(i > 20){
-    i = 20;
+  if (i > 12) {
+    i = 12;
   }
 
-  if (!(i <= -20 && error < 0) || (i >= 20 && error > 0)) {
+  if (!(i <= -5 && error < 0) || (i >= 12 && error > 0)) {
     integral = error * proc_time;
     i += ki * integral;
   }

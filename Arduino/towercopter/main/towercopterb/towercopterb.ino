@@ -100,10 +100,10 @@ void pidControl() {
   p = kp * error;
 
   // Integral action (anti-windup).
-  if(i < -20){
+  if (i < -20) {
     i = -20;
   }
-  if(i > 20){
+  if (i > 20) {
     i = 20;
   }
 
