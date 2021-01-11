@@ -21,7 +21,7 @@ The goal is to have a balancing platform, based on PID control.
 
 ---
 
-## Componenets
+## Components
 
 * controller (Arduino, RPi)
 * brushless motor (DYS D2830, 750kv)
