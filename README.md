@@ -15,6 +15,12 @@ The goal is to have a balancing platform, based on PID control.
 
 ---
 
+## Block diagram
+
+![](images/blockdiagram_towercopter.png)
+
+---
+
 ## Componenets
 
 * controller (Arduino, RPi)
